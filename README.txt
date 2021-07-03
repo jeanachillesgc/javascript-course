@@ -1,0 +1,1 @@
+Inside this repository you'll find all the projects I developed when I took a course about Javascript on Udemy. The projects you'll find here are the same projects taught in the course. 

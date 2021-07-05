@@ -1,8 +1,4 @@
-# Calculadora JavaScript
+This project was presented during the Javascript Course I took on 2021. It's a simple calculator, with all the main operations, and with the use of a sound when you click the buttons.
 
-[![Hcode Treinamentos](https://www.hcode.com.br/res/img/hcode-200x100.png)](https://www.hcode.com.br)
-
-Calculadora desenvolvida como exemplo do Curso Completo de JavaScript na Udemy.com.
-
-### Projeto
-![Calculadora](https://firebasestorage.googleapis.com/v0/b/hcode-com-br.appspot.com/o/calculadora-hcode.jpg?alt=media&token=5406aa3f-b965-401c-9b4e-654609c78b33)
+Link to the course:
+https://www.udemy.com/course/javascript-curso-completo/

@@ -1,1 +1,1 @@
-window.calculator = new CalcController();
+window.calculator = new CalcController(); // window. indicates a global variable

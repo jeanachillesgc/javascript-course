@@ -2,6 +2,8 @@ class CalcController{
 
     constructor(){
 
+        this._lastOperator = "";
+        this._lastNumber = "";
         this._operation = [];
         this._locale = "pt-BR";
         this._displayCalcEl = document.querySelector("#display");
@@ -25,6 +27,8 @@ class CalcController{
         setInterval(() =>{
             this.setDisplayDateTime();
         }, 1000);
+
+        this.setLastNumberToDisplay();
 
     }
 
@@ -73,12 +77,16 @@ class CalcController{
     clearAll(){
 
         this._operation = [];
+        this._lastNumber = "";
+        this._lastOperator = "";
+        this.setLastNumberToDisplay();
 
     }
 
     clearEntry(){
 
         this._operation.pop();
+        this.setLastNumberToDisplay();
 
     }
 
@@ -92,14 +100,21 @@ class CalcController{
         return this._operation[this._operation.length-1];
     }
 
+
     setLastOperation(value){
         this._operation[this._operation.length-1] = value;
     }
 
+    // It checks if the inserted value is and operator.
     isOperator(value){
         return (["+", "-", "*", "%", "/"].indexOf(value) > -1);
     }
 
+    /**
+     * It checks if the _operation array has more than 3 values in it, and if
+     * so it triggers the calc() method, if not it just pushs a new value.
+     *  
+     */ 
     pushOperation(value){
 
         this._operation.push(value);
@@ -107,28 +122,111 @@ class CalcController{
         if(this._operation.length > 3){            
             this.calc();
         }
+
+    }
+
+    getResult(){
+        return eval(this._operation.join(""));
     }
     
+    /**
+     * It evaluates the operation inside the _operation array.
+     */
     calc(){
-        let last = this._operation.pop();
-        let result = eval(this._operation.join(""));
-        this._operation = [result, last];
+
+        let last = "";   
+        this._lastOperator = this.getLastItem();
+
+        if(this._operation.length < 3){
+
+            let firstItem = this._operation[0];
+            this._operation = [firstItem, this._lastOperator, this._lastNumber];
+
+        }
+
+        if(this._operation.length > 3){
+
+            last = this._operation.pop();
+            this._lastOperator = this.getLastItem();
+            this._lastNumber = this.getResult();
+
+        }else if(this._operation.length == 3){
+
+            this._lastOperator = this.getLastItem();
+            this._lastNumber = this.getLastItem(false);
+
+        }
+        
+        let result = this.getResult();
+
+        if(last == "%"){
+            
+            result /= 100;
+            this._operation = [result];
+
+        }else{
+
+            this._operation = [result];
+            if(last) this._operation.push(last);
+
+        }
+        
+        this.setLastNumberToDisplay();
+
     }
 
+    /**
+     * If the last item in the _operation array is an operator, it returns the
+     * operator. If not, it returns the number.
+     */
+    getLastItem(isOperator = true){
+        let lastItem;
+
+        for(let i = this._operation.length-1; i >= 0; i--){
+            
+            if(this.isOperator(this._operation[i]) == isOperator){
+                lastItem = this._operation[i];
+                break;
+            }          
+        }
+
+        if(!lastItem){
+            lastItem = (isOperator) ? this._lastOperator : this._lastNumber;
+        }
+
+        return lastItem;
+    }
+
+    /**
+     * It updates the calculator's display with the last number in the _operation 
+     * array.
+     */
     setLastNumberToDisplay(){
         
+        let lastNumber = this.getLastItem(false);
+        if(!lastNumber) lastNumber = 0;
+        this.displayCalc = lastNumber;
+
     }
 
+    /**
+     * It checks if the last item that was inserted in the _operation array is a
+     * number or and operator. If it is and operator, it adds in another index
+     * of the array. If it is a number, it concatenates with the last number, or
+     * it is inserted in the next index of the array.
+     * 
+     */
     addOperation(value){
 
         if(isNaN(this.getLastOperation())){
             //String
             if(this.isOperator(value)){
                 this.setLastOperation(value);
-            }else if(isNaN(value)){
-                
             }else{
+
                 this.pushOperation(value);
+                this.setLastNumberToDisplay();
+
             }
 
         }else{
@@ -139,7 +237,7 @@ class CalcController{
             }else{
                 
                 let newValue = this.getLastOperation().toString() + value.toString();
-                this.setLastOperation(parseInt(newValue));
+                this.setLastOperation(parseFloat(newValue));
                 this.setLastNumberToDisplay();
 
             }
@@ -150,6 +248,22 @@ class CalcController{
         console.log(this._operation);
 
     }
+
+    addDot(){
+
+        let lastOperation = this.getLastOperation();
+
+        if(this.isOperator(lastOperation) || !lastOperation){
+            this.pushOperation("0.");
+        }else{
+            this.setLastOperation(lastOperation.toString() + ".");
+        }
+
+        this.setLastNumberToDisplay();
+
+    }
+
+    
 
     execBtn(value){
 
@@ -177,10 +291,10 @@ class CalcController{
                 this.addOperation("%");
                 break;
             case "igual":
-                
+                this.calc();
                 break;
             case "ponto":
-                this.addOperation(".");
+                this.addDot();
                 break;            
             case "1":
             case "2":

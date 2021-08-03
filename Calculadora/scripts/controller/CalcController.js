@@ -237,7 +237,7 @@ class CalcController{
             }else{
                 
                 let newValue = this.getLastOperation().toString() + value.toString();
-                this.setLastOperation(parseFloat(newValue));
+                this.setLastOperation(newValue);
                 this.setLastNumberToDisplay();
 
             }
